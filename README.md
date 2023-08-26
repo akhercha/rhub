@@ -11,7 +11,8 @@ Arguments:
   [directory]  The directory to send to Github [default: .]
 
 Options:
-  -c, --config <CONFIG>            The path to the configuration file containing the Github API key [default: config.toml]      
+  -c, --config <CONFIG>            The path to the configuration file containing the
+                                   Github API key [default: config.toml] 
   -d, --description <DESCRIPTION>  The description of the repository [default: ]
   -n, --name <NAME>                The name of the repository [default: " "]
   -p, --private                    If present, makes the repository private

@@ -30,8 +30,10 @@ Copy the `config_example.toml` file to `config.toml` and fill the fields with yo
 - [x] Create the config file
 - [x] See how to call git command from rust
 - [x] Validate the CLI args
-- [ ] When name is supplied, check if the repo exists on github
-- [ ] ...
+- [x] Check if the repo exists on github
+- [x] Create a new repo on github using arguments
+- [ ] Set the remote origin to github
+- [ ] Push the local files to the repo
 
 ## Command flow
 
@@ -42,10 +44,23 @@ Main command: `rhub` => sends the current folder to github
 `rhub $FOLDER` => sends the $FOLDER to github:
     -> if no .git folder
         -> create one
-    -> if the repo has the same name in github
+    -> if git folder
+        -> check if the repo has remote origin
+            -> if yes stop
+    -> if the repo name exists in github
         -> stop
     -> create a new repo in github using POST
-    -> set the remote origin to github
+    -> send to github
+        -> set the remote origin to git:
+            `git remote add origin git@github.com:$USER/$NAME.git` 
+        -> set the branch to main
+            `git branch -M main`
+        -> check if theres any files in the directory
+            -> if yes `git add -A`
+            -> if no create a README `echo "# $NAME" > README.md`
+                & `git add README.md`
+        -> push to github
+            `git push -u origin main`
     -> push the local repo to github
 ```
 

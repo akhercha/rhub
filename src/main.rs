@@ -4,7 +4,7 @@ mod git;
 mod toml_config;
 mod utils;
 
-use api::ApiHandler;
+use api::{create_new_repository_on_github, repo_exists_on_github, ApiHandler};
 use clap::Parser;
 use cli::CliArgs;
 use git::call_git_init;
@@ -13,18 +13,6 @@ use toml_config::{get_toml_config, TomlConfig};
 use utils::io::get_directory_name;
 
 const GITHUB_USER_AGENT: &str = "Rhub-CLI/0.1.0";
-
-/// Check if the repository exists on GitHub.
-async fn repo_exists_on_github(
-    api_handler: &ApiHandler,
-    username: &str,
-    repository_name: &str,
-) -> Result<bool, reqwest::Error> {
-    let url = format!("https://api.github.com/repos/{username}/{repository_name}");
-    let res = api_handler.get(&url).await?;
-
-    Ok(res.status() != 404)
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -40,6 +28,7 @@ async fn main() -> Result<(), Error> {
             std::process::exit(1);
         }
     }
+    println!("{:?}", cli_args);
 
     // Retrieve TOML config
     let TomlConfig {
@@ -59,6 +48,9 @@ async fn main() -> Result<(), Error> {
         eprintln!("Repository already exists on GitHub");
         std::process::exit(1);
     }
+
+    // Create new repository on GitHub
+    create_new_repository_on_github(&api_handler, &cli_args).await?;
 
     Ok(())
 }

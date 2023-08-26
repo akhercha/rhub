@@ -29,7 +29,9 @@ Copy the `config_example.toml` file to `config.toml` and fill the fields with yo
 - [x] Create the CLI args
 - [x] Create the config file
 - [x] See how to call git command from rust
-- [ ] Validate the CLI args
+- [x] Validate the CLI args
+- [ ] When name is supplied, check if the repo exists on github
+- [ ]
 - [ ] ...
 
 ## Command flow

@@ -10,7 +10,8 @@ pub struct CliArgs {
     #[arg(
         default_value = ".",
         value_name = "directory",
-        help = "The directory to send to Github"
+        help = "The directory to send to Github",
+        value_parser = validate_path,
     )]
     pub directory: String,
 
@@ -18,7 +19,8 @@ pub struct CliArgs {
         short,
         long,
         default_value = "config.toml",
-        help = "The path to the configuration file containing the Github API key"
+        help = "The path to the configuration file containing the Github API key",
+        value_parser = validate_toml_file,
     )]
     pub config: String,
 
@@ -30,7 +32,12 @@ pub struct CliArgs {
     )]
     pub description: String,
 
-    #[arg(short, long, default_value = "", help = "The name of the repository")]
+    #[arg(
+        short,
+        long,
+        default_value = "",
+        help = "The name that the repository will take on GitHub"
+    )]
     pub name: String,
 
     #[arg(
@@ -40,4 +47,29 @@ pub struct CliArgs {
         help = "If present, makes the repository private"
     )]
     pub private: bool,
+}
+
+fn validate_path(directory: &str) -> Result<String, String> {
+    let path = std::path::Path::new(directory);
+    if !path.exists() {
+        return Err(format!("Path \"{}\" does not exist", directory));
+    }
+    Ok(directory.to_string())
+}
+
+fn validate_toml_file(path: &str) -> Result<String, String> {
+    let path = std::path::Path::new(path);
+    if !path.exists() {
+        return Err(format!("Path \"{}\" does not exist", path.display()));
+    }
+    if path.is_dir() {
+        return Err(format!("Path \"{}\" is a directory", path.display()));
+    }
+    if path.extension().unwrap_or_default() != "toml" {
+        return Err(format!(
+            "Path \"{}\" does not have a .toml extension",
+            path.display()
+        ));
+    }
+    Ok(path.display().to_string())
 }

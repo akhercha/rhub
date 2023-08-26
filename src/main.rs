@@ -1,39 +1,33 @@
 mod api;
 mod cli;
 mod git;
-mod read_toml;
+mod toml_config;
+mod utils;
 
+use api::ApiHandler;
 use clap::Parser;
 use cli::CliArgs;
 use git::call_git_init;
-use read_toml::get_api_key;
 use reqwest::Error;
+use toml_config::{get_toml_config, TomlConfig};
+use utils::io::get_directory_name;
 
-async fn tests() -> Result<(), Error> {
-    // Retrieve TOML config
-    println!("Your API key is: \"{}\"", get_api_key("config.toml"));
-    // API request GET
-    api::get("https://jsonplaceholder.typicode.com/posts/1").await?;
-    // API request POST
-    api::post("https://jsonplaceholder.typicode.com/posts").await?;
-    Ok(())
-}
+const GITHUB_USER_AGENT: &str = "Rhub-CLI/0.1.0";
 
-fn get_directory_name(path: &str) -> Result<String, std::io::Error> {
-    let p = if path == "." {
-        std::env::current_dir()?
-    } else {
-        std::path::PathBuf::from(path)
-    };
-    Ok(p.file_name()
-        .map_or_else(|| ".".to_string(), |s| s.to_string_lossy().into_owned()))
+/// Check if the repository exists on GitHub.
+async fn repo_exists_on_github(
+    api_handler: &ApiHandler,
+    username: &str,
+    repository_name: &str,
+) -> Result<bool, reqwest::Error> {
+    let url = format!("https://api.github.com/repos/{username}/{repository_name}");
+    let res = api_handler.get(&url).await?;
+
+    Ok(res.status() != 404)
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    tests().await?;
-    println!("===============================");
-
     // Parse CLI arguments
     let mut cli_args = CliArgs::parse();
 
@@ -47,10 +41,18 @@ async fn main() -> Result<(), Error> {
         }
     }
 
-    // Check the args
-    println!("{:?}", cli_args);
+    // Retrieve TOML config
+    let TomlConfig {
+        github_api_key: api_key,
+        github_username: username,
+    } = get_toml_config("config.toml");
 
-    // TODO: Check if the name does not already exists on GitHub
+    let api_handler =
+        ApiHandler::new(GITHUB_USER_AGENT, &api_key).expect("Failed to create API handler");
+    if repo_exists_on_github(&api_handler, &username, &cli_args.name).await? {
+        eprintln!("Repository already exists on GitHub");
+        std::process::exit(1);
+    }
 
     // Git system call, check if .git exists else create it for the directory
     call_git_init(&cli_args.directory.as_str());

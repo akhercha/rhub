@@ -49,6 +49,8 @@ pub struct CliArgs {
     pub private: bool,
 }
 
+/// Validate a CLI path argument.
+/// If the path does not exist, return an error.
 fn validate_path(directory: &str) -> Result<String, String> {
     let path = std::path::Path::new(directory);
     if !path.exists() {
@@ -57,6 +59,11 @@ fn validate_path(directory: &str) -> Result<String, String> {
     Ok(directory.to_string())
 }
 
+/// Validate a CLI toml file argument.
+/// Returns an error if:
+///     - The path does not exist,
+///     - The path is a directory,
+///     - The path does not have a .toml extension.
 fn validate_toml_file(path: &str) -> Result<String, String> {
     let path = std::path::Path::new(path);
     if !path.exists() {

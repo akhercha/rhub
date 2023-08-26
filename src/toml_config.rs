@@ -4,7 +4,8 @@ use toml;
 
 #[derive(Debug, Deserialize)]
 pub struct TomlConfig {
-    github_api_key: String,
+    pub github_api_key: String,
+    pub github_username: String,
 }
 
 fn read(filename: &str) -> TomlConfig {
@@ -12,7 +13,7 @@ fn read(filename: &str) -> TomlConfig {
     toml::from_str(&toml_str).expect("Failed to deserialize Cargo.toml")
 }
 
-pub fn get_api_key(filename: &str) -> String {
+pub fn get_toml_config(filename: &str) -> TomlConfig {
     let config_toml: TomlConfig = read(filename);
-    config_toml.github_api_key
+    config_toml
 }

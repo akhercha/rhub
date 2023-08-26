@@ -20,6 +20,7 @@ Copy the `config_example.toml` file to `config.toml` and fill the fields with yo
 
 Main command: `rhub` => sends the current folder to github
 
+```bash
 ($FOLDER default is ".")
 `rhub $FOLDER` => sends the $FOLDER to github:
     -> if no .git folder
@@ -29,6 +30,7 @@ Main command: `rhub` => sends the current folder to github
     -> create a new repo in github using POST
     -> set the remote origin to github 
     -> push the local repo to github
+```
 
 
 Optionnal commands:

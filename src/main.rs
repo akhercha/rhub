@@ -43,19 +43,22 @@ async fn main() -> Result<(), Error> {
 
     // Retrieve TOML config
     let TomlConfig {
-        github_api_key: api_key,
+        github_pat_token: api_key,
         github_username: username,
     } = get_toml_config("config.toml");
 
+    // Api Client
     let api_handler =
         ApiHandler::new(GITHUB_USER_AGENT, &api_key).expect("Failed to create API handler");
+
+    // Git system call, check if .git exists else create it for the directory
+    call_git_init(&cli_args.directory.as_str());
+
+    // Check if repository name exists on GitHub, if yes exit
     if repo_exists_on_github(&api_handler, &username, &cli_args.name).await? {
         eprintln!("Repository already exists on GitHub");
         std::process::exit(1);
     }
-
-    // Git system call, check if .git exists else create it for the directory
-    call_git_init(&cli_args.directory.as_str());
 
     Ok(())
 }

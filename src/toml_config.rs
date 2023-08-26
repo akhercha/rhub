@@ -4,7 +4,7 @@ use toml;
 
 #[derive(Debug, Deserialize)]
 pub struct TomlConfig {
-    pub github_api_key: String,
+    pub github_pat_token: String,
     pub github_username: String,
 }
 

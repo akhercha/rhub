@@ -39,14 +39,11 @@ async fn main() -> Result<(), Error> {
 
     // Change the name argument if none is supplied
     if cli_args.name.is_empty() {
-        match get_directory_name(&cli_args.directory) {
-            Ok(dir_name) => {
-                cli_args.name = dir_name;
-            }
-            Err(e) => {
-                eprintln!("Error getting directory name: {}", e);
-                std::process::exit(1);
-            }
+        if let Ok(dir_name) = get_directory_name(&cli_args.directory) {
+            cli_args.name = dir_name;
+        } else {
+            eprintln!("Error getting directory name");
+            std::process::exit(1);
         }
     }
 

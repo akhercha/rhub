@@ -32,8 +32,12 @@ Copy the `config_example.toml` file to `config.toml` and fill the fields with yo
 - [x] Validate the CLI args
 - [x] Check if the repo exists on github
 - [x] Create a new repo on github using arguments
-- [ ] Set the remote origin to github
-- [ ] Push the local files to the repo
+- [x] Set the remote origin to github
+- [x] Push the local files to the repo
+- [ ] Build the command & try to use it as a binary in linux
+- [ ] Refacto the code (git file, erk)
+- [ ] See if the configuration is good for this kind of binary, maybe
+      implement `rhub --config pat "$TOKEN"` and `rhub --config github_username "$USER"`
 
 ## Command flow
 
@@ -61,7 +65,6 @@ Main command: `rhub` => sends the current folder to github
                 & `git add README.md`
         -> push to github
             `git push -u origin main`
-    -> push the local repo to github
 ```
 
 Optionnal commands:

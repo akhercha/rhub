@@ -5,9 +5,9 @@ mod read_toml;
 
 use clap::Parser;
 use cli::CliArgs;
+use git::call_git_status;
 use read_toml::retrieve_api_key;
 use reqwest::Error;
-use git::call_git_status;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {

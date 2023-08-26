@@ -12,18 +12,17 @@ Arguments:
 
 Options:
   -c, --config <CONFIG>            The path to the configuration file containing the
-                                   Github API key [default: config.toml] 
+                                   Github API key [default: config.toml]
   -d, --description <DESCRIPTION>  The description of the repository [default: ]
   -n, --name <NAME>                The name of the repository [default: " "]
   -p, --private                    If present, makes the repository private
   -h, --help                       Print help
   -V, --version                    Print version
-  ```
+```
 
 ## Requirements
 
 Copy the `config_example.toml` file to `config.toml` and fill the fields with your github credentials.
-
 
 ## Todo
 
@@ -31,7 +30,7 @@ Copy the `config_example.toml` file to `config.toml` and fill the fields with yo
 - [x] Create the config file
 - [x] See how to call git command from rust
 - [ ] Validate the CLI args
-- [ ] ... 
+- [ ] ...
 
 ## Command flow
 
@@ -45,10 +44,9 @@ Main command: `rhub` => sends the current folder to github
     -> if the repo has the same name in github
         -> stop
     -> create a new repo in github using POST
-    -> set the remote origin to github 
+    -> set the remote origin to github
     -> push the local repo to github
 ```
-
 
 Optionnal commands:
 

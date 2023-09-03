@@ -22,7 +22,8 @@ Options:
 
 ## Requirements
 
-Copy the `config_example.toml` file to `config.toml` and fill the fields with your github credentials.
+Copy the `config_example.toml` file to `config.toml` and fill the fields with your github
+credentials.
 
 ## Todo
 
@@ -34,10 +35,11 @@ Copy the `config_example.toml` file to `config.toml` and fill the fields with yo
 - [x] Create a new repo on github using arguments
 - [x] Set the remote origin to github
 - [x] Push the local files to the repo
-- [ ] Build the command & try to use it as a binary in linux
-- [ ] Refacto the code (git file, erk)
-- [ ] See if the configuration is good for this kind of binary, maybe
+- [ ] Remove the .toml file requirement & change the way the token is provided, maybe
       implement `rhub --config pat "$TOKEN"` and `rhub --config github_username "$USER"`
+- [ ] Refacto the git command flow (yikes)
+- [ ] Build the command & try to use it as a binary in linux
+- [ ] See if the configuration is good for this kind of binary,
 
 ## Command flow
 

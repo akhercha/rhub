@@ -1,8 +1,10 @@
-use reqwest::{header, Client, Error, Response, StatusCode};
-
 use super::cli::CliArgs;
+use reqwest::{header, Client, Error, Response, StatusCode};
+use serde_json::Value;
 
-pub struct ApiHandler {
+const USER_AGENT: &str = "Rhub-CLI/0.1.0";
+
+struct ApiHandler {
     client: Client,
 }
 
@@ -18,10 +20,10 @@ impl ApiHandler {
         Ok(headers)
     }
 
-    pub fn new(user_agent: &str, token: &str) -> Result<Self, header::InvalidHeaderValue> {
+    pub fn new(token: &str) -> Result<Self, header::InvalidHeaderValue> {
         let headers = Self::generate_headers(token)?;
         let client = reqwest::Client::builder()
-            .user_agent(user_agent)
+            .user_agent(USER_AGENT)
             .default_headers(headers)
             .build()
             .expect("Failed to build the API client");
@@ -44,48 +46,68 @@ impl ApiHandler {
     }
 }
 
-/// Check if the repository exists on GitHub.
-pub async fn repo_exists_on_github(
-    api_handler: &ApiHandler,
-    username: &str,
-    repository_name: &str,
-) -> Result<bool, reqwest::Error> {
-    let url = format!("https://api.github.com/repos/{username}/{repository_name}");
-    let res = api_handler.get(&url).await?;
-    match res.status() {
-        StatusCode::OK => Ok(true),
-        StatusCode::NOT_FOUND => Ok(false),
-        StatusCode::UNAUTHORIZED => {
-            panic!("UNAUTHORIZED: The provided github_pat_token is probably invalid.")
-        }
-        _ => panic!("Error: {}", res.status()),
-    }
+pub struct GithubApi {
+    handler: ApiHandler,
 }
 
-pub async fn create_new_repository_on_github(
-    api_handler: &ApiHandler,
-    cli_args: &CliArgs,
-) -> Result<(), reqwest::Error> {
-    let url = "https://api.github.com/user/repos".to_string();
-    let body = format!(
-        r#"
-        {{
-            "name": "{repository_name}",
-            "description": "{description}",
-            "private": {private}
-        }}
-        "#,
-        repository_name = cli_args.name,
-        description = cli_args.description,
-        private = cli_args.private
-    );
-    let res = api_handler.post(&url, &body).await?;
-    if res.status() == 201 {
-        println!("Repository created successfully on GitHub");
-    } else {
-        eprintln!("Failed to create repository on GitHub");
-        std::process::exit(1);
+impl GithubApi {
+    pub fn new(token: &str) -> Result<Self, header::InvalidHeaderValue> {
+        let handler = ApiHandler::new(token)?;
+        Ok(GithubApi { handler })
     }
 
-    Ok(())
+    pub async fn repo_exists(&self, username: &str, repository_name: &str) -> Result<bool, Error> {
+        let url = format!("https://api.github.com/repos/{username}/{repository_name}");
+        let res = self.handler.get(&url).await?;
+        match res.status() {
+            StatusCode::OK => Ok(true),
+            StatusCode::NOT_FOUND => Ok(false),
+            StatusCode::UNAUTHORIZED => {
+                panic!("UNAUTHORIZED: The provided github_pat_token is probably invalid.")
+            }
+            _ => panic!("Error: {}", res.status()),
+        }
+    }
+
+    pub async fn create_new_repository(&self, cli_args: &CliArgs) -> Result<(), Error> {
+        let url = "https://api.github.com/user/repos".to_string();
+        let body = format!(
+            r#"
+            {{
+                "name": "{repository_name}",
+                "description": "{description}",
+                "private": {private}
+            }}
+            "#,
+            repository_name = cli_args.name,
+            description = cli_args.description,
+            private = cli_args.private
+        );
+        let res = self.handler.post(&url, &body).await?;
+        if res.status() == 201 {
+            println!("Repository created successfully on GitHub");
+        } else {
+            eprintln!("Failed to create repository on GitHub");
+            std::process::exit(1);
+        }
+        Ok(())
+    }
+
+    pub async fn get_username(&self) -> Result<String, Error> {
+        let url = "https://api.github.com/user".to_string();
+        let res = self.handler.get(&url).await?;
+        match res.status() {
+            StatusCode::OK => {
+                let body = res.text().await?;
+                let json_body: Value =
+                    serde_json::from_str(&body).expect("Failed to parse JSON body");
+                assert!(json_body["login"].is_string());
+                Ok(json_body["login"].as_str().unwrap().to_string())
+            }
+            StatusCode::UNAUTHORIZED => {
+                panic!("UNAUTHORIZED: The provided github_pat_token is probably invalid.")
+            }
+            _ => panic!("Error: {}", res.status()),
+        }
+    }
 }

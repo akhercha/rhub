@@ -4,7 +4,7 @@ mod git;
 mod toml_config;
 mod utils;
 
-use api::{create_new_repository_on_github, repo_exists_on_github, ApiHandler};
+use api::GithubApi;
 use clap::Parser;
 use cli::CliArgs;
 use git::{
@@ -14,8 +14,6 @@ use git::{
 use reqwest::Error;
 use toml_config::{get_toml_config, TomlConfig};
 use utils::fs::{count_files_in_path, get_directory_name};
-
-const GITHUB_USER_AGENT: &str = "Rhub-CLI/0.1.0";
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -27,21 +25,20 @@ async fn main() -> Result<(), Error> {
             panic!("Error getting directory name");
         }
     }
+    // TODO: drop the TOML config
     let TomlConfig {
         github_pat_token: api_key,
-        github_username: username,
     } = get_toml_config(&cli_args.config);
 
-    let api_handler =
-        ApiHandler::new(GITHUB_USER_AGENT, &api_key).expect("Failed to create API handler");
-
-    if repo_exists_on_github(&api_handler, &username, &cli_args.name).await? {
+    let api = GithubApi::new(&api_key).expect("Failed to create API handler");
+    let username: String = api.get_username().await?;
+    if api.repo_exists(&username, &cli_args.name).await? {
         panic!("Repository already exists on GitHub");
     }
 
+    // TODO: currently yikes, refactor this
     call_git_init(cli_args.directory.as_str());
-
-    create_new_repository_on_github(&api_handler, &cli_args).await?;
+    api.create_new_repository(&cli_args).await?;
     if count_files_in_path(&cli_args.directory) == 0 {
         create_readme(&cli_args.directory, &cli_args.name);
     }

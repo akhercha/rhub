@@ -9,5 +9,6 @@ edition = "2021"
 clap = { version = "4.4.0", features = ["derive"] }
 reqwest = "0.11.20"
 serde = { version = "1.0.188", features = ["derive"] }
+serde_json = "1.0.105"
 tokio = { version = "1.32.0", features = ["full"] }
 toml = "0.7.6"

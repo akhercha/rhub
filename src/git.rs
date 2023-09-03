@@ -19,7 +19,7 @@ const README_FILE: &str = "README.md";
 pub fn set_remote_origin(directory: &str, user: &str, repo_name: &str) {
     let url = format!("git@github.com:{}/{}.git", user, repo_name);
     Command::new(GIT_COMMAND)
-        .args(&[GIT_REMOTE_ADD_ARG, "add", "origin", &url])
+        .args([GIT_REMOTE_ADD_ARG, "add", "origin", &url])
         .current_dir(directory)
         .output()
         .expect("failed to add remote");
@@ -29,7 +29,7 @@ pub fn set_remote_origin(directory: &str, user: &str, repo_name: &str) {
 /// Rename the current branch to main.
 pub fn rename_branch_to_main(directory: &str) {
     Command::new(GIT_COMMAND)
-        .args(&[GIT_BRANCH_ARG, "-M", "main"])
+        .args([GIT_BRANCH_ARG, "-M", "main"])
         .current_dir(directory)
         .output()
         .expect("failed to rename branch");
@@ -39,7 +39,7 @@ pub fn rename_branch_to_main(directory: &str) {
 /// Stage all the files in the directory.
 pub fn stage_files(directory: &str) {
     Command::new(GIT_COMMAND)
-        .args(&[GIT_ADD_ARG, "-A"])
+        .args([GIT_ADD_ARG, "-A"])
         .current_dir(directory)
         .output()
         .expect("failed to add files");
@@ -62,7 +62,7 @@ pub fn create_readme(directory: &str, repo_name: &str) {
 /// Commit the staged changes with the given message.
 pub fn commit_changes(directory: &str, message: &str) {
     Command::new(GIT_COMMAND)
-        .args(&[GIT_COMMIT_ARG, "-m", message])
+        .args([GIT_COMMIT_ARG, "-m", message])
         .current_dir(directory)
         .output()
         .expect("failed to commit changes");
@@ -73,7 +73,7 @@ pub fn commit_changes(directory: &str, message: &str) {
 /// If the push fails, exit with an error.
 pub fn push_to_github(directory: &str) {
     Command::new(GIT_COMMAND)
-        .args(&[GIT_PUSH_ARG, "-u", "origin", "main"])
+        .args([GIT_PUSH_ARG, "-u", "origin", "main"])
         .current_dir(directory)
         .output()
         .expect("failed to push to github");
@@ -84,7 +84,7 @@ pub fn push_to_github(directory: &str) {
 /// If it does, return true.
 fn has_remote_origin_set(git_path: &Path) -> bool {
     let command_output = Command::new(GIT_COMMAND)
-        .args(&[GIT_LS_REMOTE_ARG])
+        .args([GIT_LS_REMOTE_ARG])
         .current_dir(git_path)
         .output()
         .expect("failed to execute process");
@@ -105,7 +105,7 @@ pub fn call_git_init(directory: &str) {
         return;
     }
     let command_output = Command::new(GIT_COMMAND)
-        .args(&[GIT_INIT_ARG, directory])
+        .args([GIT_INIT_ARG, directory])
         .output()
         .expect("failed to execute process");
 

@@ -1,5 +1,4 @@
-use reqwest;
-use reqwest::{header, Client, Error, Response};
+use reqwest::{header, Client, Error, Response, StatusCode};
 
 use super::cli::CliArgs;
 
@@ -53,15 +52,21 @@ pub async fn repo_exists_on_github(
 ) -> Result<bool, reqwest::Error> {
     let url = format!("https://api.github.com/repos/{username}/{repository_name}");
     let res = api_handler.get(&url).await?;
-
-    Ok(res.status() != 404)
+    match res.status() {
+        StatusCode::OK => Ok(true),
+        StatusCode::NOT_FOUND => Ok(false),
+        StatusCode::UNAUTHORIZED => {
+            panic!("UNAUTHORIZED: The provided github_pat_token is probably invalid.")
+        }
+        _ => panic!("Error: {}", res.status()),
+    }
 }
 
 pub async fn create_new_repository_on_github(
     api_handler: &ApiHandler,
     cli_args: &CliArgs,
 ) -> Result<(), reqwest::Error> {
-    let url = format!("https://api.github.com/user/repos");
+    let url = "https://api.github.com/user/repos".to_string();
     let body = format!(
         r#"
         {{

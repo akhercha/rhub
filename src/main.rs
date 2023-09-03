@@ -19,40 +19,35 @@ const GITHUB_USER_AGENT: &str = "Rhub-CLI/0.1.0";
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    // Parse CLI arguments
     let mut cli_args = CliArgs::parse();
 
-    // Change the name argument if none is supplied
     if cli_args.name.is_empty() {
         if let Ok(dir_name) = get_directory_name(&cli_args.directory) {
             cli_args.name = dir_name;
         } else {
-            eprintln!("Error getting directory name");
-            std::process::exit(1);
+            panic!("Error getting directory name");
         }
     }
-
-    // Retrieve TOML config
+    let config_path = if cli_args.config.is_empty() {
+        "config.toml"
+    } else {
+        &cli_args.config
+    };
     let TomlConfig {
         github_pat_token: api_key,
         github_username: username,
-    } = get_toml_config("config.toml");
+    } = get_toml_config(config_path);
 
-    // Api Client
     let api_handler =
         ApiHandler::new(GITHUB_USER_AGENT, &api_key).expect("Failed to create API handler");
 
-    // Check if repository name exists on GitHub, if yes exit
     if repo_exists_on_github(&api_handler, &username, &cli_args.name).await? {
-        eprintln!("Repository already exists on GitHub");
-        std::process::exit(1);
+        panic!("Repository already exists on GitHub");
     }
 
-    // Git system call, check if .git exists else create it for the directory
-    call_git_init(&cli_args.directory.as_str());
+    call_git_init(cli_args.directory.as_str());
 
     create_new_repository_on_github(&api_handler, &cli_args).await?;
-
     if count_files_in_path(&cli_args.directory) == 0 {
         create_readme(&cli_args.directory, &cli_args.name);
     }

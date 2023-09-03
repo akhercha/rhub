@@ -1,6 +1,6 @@
 # rhub
 
-Rhub is a CLI tool to create a github repository from a local folder.
+Rhub is a CLI tool that automatically creates github repositories from local folders.
 
 ```bash
 Rhub is a CLI for pushing local repositories to Github.
@@ -70,12 +70,6 @@ Main command: `rhub` => sends the current folder to github
 Optionnal commands:
 
 ```bash
-`-n --name`
-    name that the repository will take on github (default is the current folder name)
-`-d --description`
-    description of the repository (default is empty)
-`-p --private`
-    set the repository to private (default is public)
 `-c --config`
     set the path to the config file (default is config.toml)
 ```

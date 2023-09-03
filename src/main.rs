@@ -20,7 +20,6 @@ const GITHUB_USER_AGENT: &str = "Rhub-CLI/0.1.0";
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let mut cli_args = CliArgs::parse();
-
     if cli_args.name.is_empty() {
         if let Ok(dir_name) = get_directory_name(&cli_args.directory) {
             cli_args.name = dir_name;
@@ -28,15 +27,10 @@ async fn main() -> Result<(), Error> {
             panic!("Error getting directory name");
         }
     }
-    let config_path = if cli_args.config.is_empty() {
-        "config.toml"
-    } else {
-        &cli_args.config
-    };
     let TomlConfig {
         github_pat_token: api_key,
         github_username: username,
-    } = get_toml_config(config_path);
+    } = get_toml_config(&cli_args.config);
 
     let api_handler =
         ApiHandler::new(GITHUB_USER_AGENT, &api_key).expect("Failed to create API handler");

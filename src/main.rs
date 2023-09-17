@@ -1,7 +1,6 @@
 mod api;
 mod cli;
 mod git;
-mod toml_config;
 mod utils;
 
 use api::GithubApi;
@@ -12,7 +11,7 @@ use git::{
     set_remote_origin, stage_files,
 };
 use reqwest::Error;
-use toml_config::{get_toml_config, TomlConfig};
+use std::env;
 use utils::fs::{count_files_in_path, get_directory_name};
 
 #[tokio::main]
@@ -25,12 +24,11 @@ async fn main() -> Result<(), Error> {
             panic!("Error getting directory name");
         }
     }
-    // TODO: drop the TOML config
-    let TomlConfig {
-        github_pat_token: api_key,
-    } = get_toml_config(&cli_args.config);
 
+    // TODO: abstract this out + allow for CLI argument or config file
+    let api_key = env::var("GITHUB_PERSONAL_TOKEN").expect("GITHUB_PERSONAL_TOKEN not set");
     let api = GithubApi::new(&api_key).expect("Failed to create API handler");
+
     let username: String = api.get_username().await?;
     if api.repo_exists(&username, &cli_args.name).await? {
         panic!("Repository already exists on GitHub");

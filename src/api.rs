@@ -14,9 +14,9 @@ impl ApiHandler {
     fn generate_headers(token: &str) -> Result<header::HeaderMap, header::InvalidHeaderValue> {
         let mut headers = header::HeaderMap::new();
         let auth_value: String = format!("Bearer {}", token);
-        let mut header_value = header::HeaderValue::from_str(&auth_value)?;
-        header_value.set_sensitive(true);
-        headers.insert(header::AUTHORIZATION, header_value);
+        let mut auth_token = header::HeaderValue::from_str(&auth_value)?;
+        auth_token.set_sensitive(true);
+        headers.insert(header::AUTHORIZATION, auth_token);
         Ok(headers)
     }
 

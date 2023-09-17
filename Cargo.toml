@@ -2,8 +2,14 @@
 name = "rhub"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+authors = ["akhercha <me@akhercha.sh>"]
+description = "CLI tool that automatically creates github repositories from local folders"
+readme = "README.md"
+homepage = "https://github.com/akhercha/rhub"
+repository = "https://github.com/akhercha/rhub"
+keywords = ["cli", "push", "create", "repository"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 clap = { version = "4.4.0", features = ["derive"] }

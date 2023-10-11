@@ -20,10 +20,10 @@ Options:
 
 ## Credentials
 
-You must set the GITHUB_PERSONAL_TOKEN environment variable to your github token:
+You must set the GITHUB_TOKEN environment variable to your github token:
 
 ```bash
-export GITHUB_PERSONAL_TOKEN=your_token
+export GITHUB_TOKEN=your_token
 ```
 
 TODO: Add a way to set the token in a config file / CLI parameter.

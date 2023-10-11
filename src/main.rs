@@ -26,7 +26,7 @@ async fn main() -> Result<(), Error> {
     }
 
     // TODO: abstract this out + allow for CLI argument or config file
-    let api_key = env::var("GITHUB_PERSONAL_TOKEN").expect("GITHUB_PERSONAL_TOKEN not set");
+    let api_key = env::var("GITHUB_TOKEN").expect("GITHUB_TOKEN not set");
     let api = GithubApi::new(&api_key).expect("Failed to create API handler");
 
     let username: String = api.get_username().await?;
